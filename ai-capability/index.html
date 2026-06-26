@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ITIL AI 6C">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>ITIL AI Capability Model (6C)</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{height:100%;overflow:hidden}
+    body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      -webkit-font-smoothing:antialiased;height:100%;overflow:auto;
+      -webkit-overflow-scrolling:touch;overscroll-behavior:none}
+    #root{min-height:100vh;min-height:100dvh;
+      padding-top:env(safe-area-inset-top,0);
+      padding-bottom:env(safe-area-inset-bottom,0)}
+    button{font-family:inherit;-webkit-tap-highlight-color:transparent}
+    @media(prefers-color-scheme:dark){
+      :root{--bg-color:#0f172a;--card-bg:#1e293b;--text-color:#e2e8f0;
+        --text-secondary:#94a3b8;--border-color:#334155}
+      body{background:#0f172a;color:#e2e8f0}
+    }
+    @media(prefers-color-scheme:light){
+      :root{--bg-color:#fff;--card-bg:#f8f9fa;--text-color:#1a1a2e;
+        --text-secondary:#6b7280;--border-color:#e5e7eb}
+      body{background:#fff;color:#1a1a2e}
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+    const { useState } = React;
+
+
+const capabilities = [
+  {
+    id:"creation", name:"Creación", nameEN:"Creation", icon:"✨", color:"#7C3AED", num:1,
+    desc:"La IA genera resultados completamente nuevos en respuesta a indicaciones (prompts) o desencadenantes. Incluye contenido, código, documentación o cualquier artefacto que no existía antes.",
+    examples:[
+      "Generar respuestas a preguntas de usuarios",
+      "Generar textos individualizados adaptando mensajes al idioma, rol y preferencias de stakeholders",
+      "Generación automática de notas de release, anuncios de cambios y planes de despliegue",
+      "Redactar descripciones de servicio o SLAs",
+      "Generar un flujo de trabajo basado en condiciones o reglas de negocio",
+      "Escribir código para funciones específicas según entrada del usuario"
+    ],
+    icr:"ICR podría usar IA generativa para crear automáticamente las notas de release de cada actualización de la app unificada, adaptando el mensaje por mercado y regulación local.",
+    lifecycle:["Descubrir — generar borradores de roadmap","Diseñar — generar prototipos y especificaciones","Construir — generación de código y documentación","Transición — generar planes de despliegue","Entregar — generar SLAs personalizados","Dar soporte — redactar respuestas a incidentes"],
+    risk:"Alto — puede generar contenido incorrecto (alucinaciones). Requiere revisión humana antes de publicar."
+  },
+  {
+    id:"curation", name:"Conservación", nameEN:"Curation", icon:"🗂️", color:"#059669", num:2,
+    desc:"La IA mejora la calidad, organización y relevancia de datos o conocimientos existentes, identificando redundancias, información obsoleta, inconsistencias o incumplimientos.",
+    examples:[
+      "Detectar y marcar artículos obsoletos de la base de conocimientos",
+      "Detectar y depurar registros duplicados en bases de datos de gestión de productos/servicios",
+      "Destacar discrepancias entre SLAs y contratos de soporte con proveedores",
+      "Validar documentos verificando alineación con políticas y normas corporativas aprobadas",
+      "Depurar registros de CI duplicados en la CMDB"
+    ],
+    icr:"ICR podría usar IA para detectar automáticamente discrepancias entre los SLAs comprometidos con clientes y los contratos reales con proveedores de pagos y mapas en cada mercado.",
+    lifecycle:["Descubrir — validar datos de mercado y eliminar duplicados","Adquirir — verificar cumplimiento de contratos con políticas","Operar — depurar CMDB y registros de activos","Dar soporte — mantener la base de conocimiento limpia y actualizada"],
+    risk:"Medio — puede eliminar o marcar contenido válido como obsoleto si los criterios no están bien definidos."
+  },
+  {
+    id:"clarification", name:"Claridad", nameEN:"Clarification", icon:"🔍", color:"#2563EB", num:3,
+    desc:"La IA ayuda a usuarios a encontrar, comprender, navegar o mejorar contenido existente resumiéndolo, reformulándolo, reestructurándolo o traduciéndolo.",
+    examples:[
+      "Resumir un ticket de incidente complejo para informes de gestión",
+      "Reescribir un artículo de conocimiento para facilitar su comprensión",
+      "Generar un informe de resumen específico del contexto mediante lenguaje natural",
+      "Clasificación y atribución mejorada de costos de TI para asignación precisa"
+    ],
+    icr:"ICR podría usar IA para resumir automáticamente tickets de incidentes complejos de la app unificada en reportes ejecutivos para Max (CIO), adaptando el nivel de detalle según el destinatario.",
+    lifecycle:["Descubrir — resumir análisis PESTLE para ejecutivos","Diseñar — traducir especificaciones técnicas a lenguaje de negocio","Operar — resumir informes de rendimiento","Dar soporte — simplificar artículos de conocimiento para usuarios"],
+    risk:"Bajo-medio — la reformulación puede perder matices. Útil como apoyo pero no como reemplazo del análisis humano."
+  },
+  {
+    id:"cognition", name:"Conocimiento", nameEN:"Cognition", icon:"🧠", color:"#D97706", num:4,
+    desc:"La IA identifica patrones, anomalías o conocimientos ocultos en los datos, permitiendo detección proactiva, pronóstico y análisis.",
+    examples:[
+      "Analizar un incidente mayor para entender posibles razones y consecuencias",
+      "Detectar tendencias de incidentes recurrentes que indican un problema más profundo",
+      "Identificar cuellos de botella en un proceso o flujo de valor",
+      "Identificar posibles problemas causados por cambios en entornos complejos",
+      "Predecir aumentos en la carga de trabajo basados en patrones históricos y tendencias estacionales"
+    ],
+    icr:"ICR usa AI/ML para mantenimiento predictivo de su flota y ruteo inteligente. En la app, la IA detecta tendencias de errores de autenticación antes de que escalen a incidentes mayores.",
+    lifecycle:["Descubrir — identificar patrones de comportamiento de usuarios por segmento","Diseñar — detectar problemas de usabilidad en datos de pruebas","Operar — predecir picos de carga y necesidades de escalado","Dar soporte — correlacionar incidentes para encontrar causas raíz"],
+    risk:"Medio-alto — patrones detectados pueden ser correlaciones espurias. Las decisiones críticas requieren validación humana."
+  },
+  {
+    id:"communication", name:"Comunicación", nameEN:"Communication", icon:"💬", color:"#0891B2", num:5,
+    desc:"La IA actúa como interfaz comunicativa que ayuda a los usuarios a interactuar con servicios y sistemas de forma natural.",
+    examples:[
+      "Chatbots que ayudan a usuarios a obtener soporte técnico",
+      "Agentes virtuales que asisten con el envío de solicitudes de servicio",
+      "Comunicación personalizada de incidentes graves con usuarios finales, adaptando mensajes a su idioma, rol y preferencias"
+    ],
+    icr:"ICR integra en su app chat in-app, knowledge bases y ayuda contextual. Un chatbot podría ayudar a usuarios a resolver problemas de reserva sin contactar al service desk.",
+    lifecycle:["Diseñar — incorporar chatbots y asistentes en el diseño del producto","Entregar — self-service para solicitudes de servicio","Dar soporte — comunicación proactiva durante incidentes mayores"],
+    risk:"Medio — la IA puede dar respuestas incorrectas o insensibles. Requiere escalamiento claro a humanos."
+  },
+  {
+    id:"coordination", name:"Coordinación", nameEN:"Coordination", icon:"🤖", color:"#DC2626", num:6,
+    desc:"La IA ejecuta, orquesta o desencadena acciones de forma autónoma en distintos sistemas, a menudo en respuesta a eventos, solicitudes o patrones. Incluye la IA agéntica.",
+    examples:[
+      "Priorizar solicitudes entrantes de usuarios y asignarlas a equipos más adecuados",
+      "Escalar automáticamente incidentes de alto impacto basándose en análisis en tiempo real",
+      "Activar flujos de trabajo de remediación tras detectar errores, eventos o tendencias específicos"
+    ],
+    icr:"ICR podría usar IA agéntica para escalar automáticamente incidentes de pago que afectan a múltiples mercados, activando los playbooks de respuesta conjunta con proveedores.",
+    lifecycle:["Construir — optimización de pipelines CI/CD","Transición — orquestar despliegues automatizados","Operar — auto-escalado de infraestructura; auto-remediación","Dar soporte — asignación automática de tickets y escalamiento"],
+    risk:"ALTO — actúa autónomamente. Requiere supervisión humana estricta, límites claros y gobernanza robusta. Es el nivel más riesgoso del modelo."
+  }
+];
+
+const definitions = [
+  {t:"Inteligencia Artificial (IA)",d:"Capacidad de los sistemas digitales para realizar tareas que normalmente requieren inteligencia humana: aprender de datos, reconocer patrones, hacer predicciones o apoyar la toma de decisiones."},
+  {t:"IA Generativa (Gen AI)",d:"IA basada en grandes modelos de lenguaje que genera contenido nuevo (texto, código, imágenes) en respuesta a prompts."},
+  {t:"IA Agéntica (Agentic AI)",d:"Sistemas de IA diseñados para actuar en nombre de usuarios realizando tareas predefinidas de forma autónoma dentro de límites acordados, sujetos a supervisión humana y gobernanza."},
+  {t:"Gobernanza de IA",d:"Sistema por el cual una organización dirige, controla y monitoriza el uso de IA para asegurar que los productos y servicios habilitados por IA creen valor siendo éticos, seguros, conformes y alineados con objetivos."},
+  {t:"Madurez de IA",d:"Grado en que una organización puede usar capacidades de IA de forma efectiva, responsable y consistente, incluyendo gobernanza, calidad de datos, habilidades, procesos y ética."},
+  {t:"Modelo 6C",d:"Nombre alternativo del Modelo de Competencias IA de ITIL. Clasifica funcionalmente las soluciones de IA en 6 categorías: Creación, Conservación, Claridad, Conocimiento, Comunicación y Coordinación."}
+];
+
+const governance = [
+  {title:"La IA NO reemplaza la responsabilidad humana",desc:"Las decisiones sobre priorización, aceptación de riesgos, gobernanza y cambio siguen siendo responsabilidad de las personas.",icon:"👤"},
+  {title:"Transparencia y explicabilidad",desc:"Las organizaciones deben establecer controles para transparencia, explicabilidad y confianza en las soluciones de IA.",icon:"🔎"},
+  {title:"Equidad, sesgo y ética",desc:"Se deben abordar la equidad, el sesgo y el uso ético de datos. La IA puede introducir o amplificar sesgos existentes.",icon:"⚖️"},
+  {title:"Mejora continua de la IA",desc:"La IA debe integrarse en prácticas de mejora continua, donde el feedback de monitorización refine las capacidades.",icon:"🔄"},
+  {title:"Supervisión humana para alto riesgo",desc:"Los usos de alto riesgo de IA requieren supervisión humana (human-in-the-loop), especialmente Coordinación y Creación.",icon:"🛡️"},
+  {title:"Gobernanza según contexto",desc:"ICR clasifica los casos de uso de IA por riesgo e impacto; la intensidad de gobernanza se adapta al nivel de riesgo.",icon:"📊"}
+];
+
+const traps = [
+  "El modelo 6C es una CLASIFICACIÓN FUNCIONAL, NO un modelo de madurez ni un framework de gobernanza.",
+  "Las 6 capacidades NO son mutuamente excluyentes — un caso real puede combinar varias (ej: un chatbot usa Comunicación + Claridad + Creación).",
+  "La IA es un MULTIPLICADOR de capacidad humana, no un reemplazo. La responsabilidad humana permanece.",
+  "Coordinación (la 6ta C) es la de MAYOR riesgo porque actúa autónomamente — incluye IA agéntica.",
+  "No confundir el AI Capability Model con el AI Maturity Model — son conceptos diferentes: uno clasifica funciones, el otro mide madurez organizacional.",
+  "Antes de implementar AIOps, primero hay que mejorar la estructura de datos, la observabilidad y la higiene de eventos (pregunta del SP1 Q34)."
+];
+
+const quiz = [
+  {q:"¿Cuál es el propósito PRINCIPAL del Modelo de Competencias IA de ITIL?",opts:["Clasificar funcionalmente las soluciones de IA","Definir niveles de madurez de gobernanza de IA","Prescribir controles obligatorios para despliegue de IA","Medir el retorno financiero del uso de IA"],ans:0},
+  {q:"Un chatbot ayuda a usuarios a enviar solicitudes de servicio. ¿Qué capacidad del modelo 6C representa PRINCIPALMENTE?",opts:["Creación","Claridad","Comunicación","Coordinación"],ans:2},
+  {q:"La IA detecta tendencias de incidentes recurrentes que indican un problema más profundo. ¿Qué capacidad?",opts:["Conservación","Conocimiento (Cognición)","Claridad","Coordinación"],ans:1},
+  {q:"La IA genera automáticamente notas de release basadas en datos estructurados de liberación. ¿Qué capacidad?",opts:["Creación","Conservación","Comunicación","Coordinación"],ans:0},
+  {q:"La IA valida documentos verificando alineación con políticas corporativas aprobadas. ¿Qué capacidad?",opts:["Creación","Conservación (Curación)","Claridad","Conocimiento"],ans:1},
+  {q:"La IA escala automáticamente incidentes de alto impacto basándose en análisis en tiempo real. ¿Qué capacidad?",opts:["Conocimiento","Comunicación","Coordinación","Creación"],ans:2},
+  {q:"¿Las 6 capacidades del modelo son mutuamente excluyentes?",opts:["Sí, cada solución de IA pertenece a una sola categoría","No, muchos casos reales combinan varias capacidades"],ans:1},
+  {q:"El equipo de ops quiere implementar AIOps pero las alertas son inconsistentes y duplicadas. ¿Qué hacer PRIMERO?",opts:["Desplegar la herramienta AI inmediatamente","Aumentar umbrales de alertas","Mejorar estructura de datos, modelado de observabilidad e higiene de eventos","Reemplazar herramientas de monitorización por plataforma AI"],ans:2},
+  {q:"¿La IA reemplaza la responsabilidad humana en la toma de decisiones?",opts:["Sí, para tareas automatizadas","No — las decisiones de priorización, riesgo y gobernanza siguen siendo responsabilidad humana"],ans:1}
+];
+
+const Pill=({t,c})=><span style={{display:"inline-block",padding:"3px 7px",fontSize:"10.5px",background:`${c}15`,color:c,borderRadius:"4px",fontWeight:600,margin:"2px 3px 2px 0"}}>{t}</span>;
+
+const Section=({title,color,children,open:initOpen=true})=>{
+  const[o,setO]=useState(initOpen);
+  return <div style={{marginBottom:"10px"}}>
+    <button onClick={()=>setO(!o)} style={{display:"flex",alignItems:"center",gap:"7px",width:"100%",background:"none",border:"none",cursor:"pointer",padding:"7px 0",borderBottom:`2px solid ${color}`,marginBottom:o?"8px":0}}>
+      <span style={{fontSize:"9px",color,transform:o?"rotate(90deg)":"rotate(0)",transition:"transform .15s"}}>▶</span>
+      <span style={{fontSize:"13px",fontWeight:700,color}}>{title}</span>
+    </button>
+    {o&&children}
+  </div>;
+};
+
+const App = function App(){
+  const[sel,setSel]=useState(null);
+  const[quizState,setQuizState]=useState({});
+  const c=sel!==null?capabilities[sel]:null;
+
+  return <div style={{fontFamily:"'Inter',-apple-system,sans-serif",color:"var(--text-color,#1a1a2e)",minHeight:"100vh"}}>
+    {/* Header */}
+    <div style={{background:"linear-gradient(135deg,#0f172a,#1e293b)",padding:"16px 14px 14px",borderRadius:"0 0 14px 14px",color:"#fff",marginBottom:"12px"}}>
+      <div style={{fontSize:"17px",fontWeight:800}}>ITIL AI Capability Model (6C)</div>
+      <div style={{fontSize:"11px",opacity:.65,marginBottom:"10px"}}>Modelo de Competencias IA de ITIL — Panel de Estudio</div>
+      <div style={{display:"flex",gap:"4px",flexWrap:"wrap"}}>
+        <button onClick={()=>setSel(null)} style={{padding:"5px 10px",fontSize:"11px",fontWeight:sel===null?700:500,background:sel===null?"rgba(255,255,255,.2)":"rgba(255,255,255,.06)",color:"#fff",border:"1px solid rgba(255,255,255,.15)",borderRadius:"5px",cursor:"pointer"}}>📋 Visión General</button>
+        {capabilities.map((cap,i)=><button key={cap.id} onClick={()=>setSel(i)} style={{
+          padding:"5px 9px",fontSize:"11px",fontWeight:sel===i?700:500,
+          background:sel===i?cap.color:"rgba(255,255,255,.06)",color:"#fff",
+          border:sel===i?`2px solid ${cap.color}`:"1px solid rgba(255,255,255,.12)",
+          borderRadius:"5px",cursor:"pointer",opacity:sel===i?1:.6
+        }}>{cap.icon} {cap.name}</button>)}
+      </div>
+    </div>
+
+    <div style={{padding:"0 10px 20px"}}>
+      {sel===null ? <>
+        {/* OVERVIEW */}
+        <div style={{padding:"12px",background:"var(--card-bg,#f8f9fa)",borderRadius:"10px",marginBottom:"12px",border:"1px solid var(--border-color,#e5e7eb)"}}>
+          <div style={{fontSize:"13px",fontWeight:700,marginBottom:"6px"}}>¿Qué es el Modelo 6C?</div>
+          <div style={{fontSize:"12px",lineHeight:1.6}}>Es una <strong>clasificación funcional</strong> de las soluciones de IA aplicadas a la gestión de productos y servicios digitales. Ayuda a comprender y comunicar el rango de aplicaciones posibles, y a adaptar perfiles de riesgo, controles y contramedidas según la función de cada solución.</div>
+          <div style={{fontSize:"10px",color:"var(--text-secondary,#6b7280)",marginTop:"6px",fontStyle:"italic"}}>Propósito de la IA en DPSM: mejorar la toma de decisiones y las actividades humanas de gestión, ya sea proporcionando insights más profundos o automatizando tareas rutinarias.</div>
+        </div>
+
+        {/* 6C Grid */}
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))",gap:"8px",marginBottom:"14px"}}>
+          {capabilities.map((cap,i)=><div key={cap.id} onClick={()=>setSel(i)} style={{
+            padding:"12px",background:"var(--card-bg,#f8f9fa)",borderRadius:"8px",cursor:"pointer",
+            borderLeft:`4px solid ${cap.color}`,transition:"transform .1s"
+          }}>
+            <div style={{fontSize:"20px",marginBottom:"4px"}}>{cap.icon}</div>
+            <div style={{fontSize:"13px",fontWeight:700,color:cap.color}}>{cap.num}. {cap.name}</div>
+            <div style={{fontSize:"9px",color:"var(--text-secondary,#6b7280)",marginBottom:"4px"}}>{cap.nameEN}</div>
+            <div style={{fontSize:"10px",lineHeight:1.4}}>{cap.desc.substring(0,80)}…</div>
+          </div>)}
+        </div>
+
+        {/* AI as enabler */}
+        <Section title="🤖 LA IA COMO HABILITADOR EN EL CICLO DE VIDA" color="#4F46E5">
+          <div style={{fontSize:"11px",lineHeight:1.6,marginBottom:"8px"}}>La IA fortalece la <strong>utilidad</strong> habilitando nuevas funciones, mejora la <strong>garantía</strong> con monitorización predictiva, apoya la <strong>sostenibilidad</strong> optimizando recursos, y moldea la <strong>experiencia</strong> con interacciones contextuales.</div>
+          {[
+            {act:"Descubrir",ai:"Análisis PESTLE automatizado, identificación de patrones de mercado, pronóstico de tendencias",c:"#7C3AED"},
+            {act:"Diseñar",ai:"Generación de prototipos, pruebas A/B automatizadas, diseño asistido por IA",c:"#2563EB"},
+            {act:"Adquirir",ai:"Evaluación automática de proveedores, análisis de contratos, modelado de riesgos",c:"#059669"},
+            {act:"Construir",ai:"Generación de código, pruebas automatizadas, optimización CI/CD, análisis de deuda técnica",c:"#D97706"},
+            {act:"Transición",ai:"Orquestación de despliegues, validación automatizada, detección de desvíos de configuración",c:"#DC2626"},
+            {act:"Operar",ai:"Monitorización predictiva, auto-escalado, AIOps, correlación de eventos, auto-remediación",c:"#4F46E5"},
+            {act:"Entregar",ai:"Chatbots de soporte, personalización de experiencia, self-service inteligente",c:"#0891B2"},
+            {act:"Dar soporte",ai:"Correlación de incidentes, sugerencia de causa raíz, redacción de respuestas, escalamiento automático",c:"#BE185D"}
+          ].map((item,i)=><div key={i} style={{display:"flex",gap:"8px",padding:"5px 8px",marginBottom:"3px",borderLeft:`3px solid ${item.c}`,background:"var(--card-bg,#f8f9fa)",borderRadius:"4px"}}>
+            <span style={{fontSize:"11px",fontWeight:700,color:item.c,minWidth:"80px"}}>{item.act}</span>
+            <span style={{fontSize:"10px",color:"var(--text-secondary,#6b7280)"}}>{item.ai}</span>
+          </div>)}
+        </Section>
+
+        {/* Definitions */}
+        <Section title="📖 DEFINICIONES CLAVE" color="#059669" open={false}>
+          {definitions.map((d,i)=><div key={i} style={{marginBottom:"5px",padding:"0 4px"}}><span style={{fontSize:"11px",fontWeight:700,color:"#059669"}}>{d.t}: </span><span style={{fontSize:"11px"}}>{d.d}</span></div>)}
+        </Section>
+
+        {/* Governance */}
+        <Section title="🛡️ GOBERNANZA DE IA — PRINCIPIOS CLAVE" color="#DC2626">
+          {governance.map((g,i)=><div key={i} style={{padding:"6px 10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"6px",marginBottom:"4px",borderLeft:"3px solid #DC2626"}}>
+            <div style={{fontSize:"11px",fontWeight:700}}>{g.icon} {g.title}</div>
+            <div style={{fontSize:"10px",color:"var(--text-secondary,#6b7280)",marginTop:"2px"}}>{g.desc}</div>
+          </div>)}
+        </Section>
+
+        {/* Traps */}
+        <Section title="⚠️ TRAMPAS DE EXAMEN" color="#D97706">
+          {traps.map((t,i)=><div key={i} style={{display:"flex",gap:"6px",padding:"6px 10px",background:"#FEF3C7",borderRadius:"5px",marginBottom:"4px",fontSize:"11px",lineHeight:1.5,borderLeft:"3px solid #D97706"}}><span>⚠️</span><span>{t}</span></div>)}
+        </Section>
+
+        {/* Quiz */}
+        <Section title="🧠 AUTOEVALUACIÓN (9 preguntas)" color="#4F46E5">
+          {quiz.map((q,qi)=>{
+            const answered=quizState[qi]!==undefined;
+            const correct=quizState[qi]===q.ans;
+            return <div key={qi} style={{padding:"10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"8px",marginBottom:"8px",border:answered?(correct?"2px solid #059669":"2px solid #DC2626"):"1px solid var(--border-color,#e5e7eb)"}}>
+              <div style={{fontSize:"12px",fontWeight:700,marginBottom:"8px"}}>{qi+1}. {q.q}</div>
+              {q.opts.map((opt,oi)=>{
+                let bg="transparent",border="1px solid var(--border-color,#d1d5db)",col="var(--text-color,#1a1a2e)";
+                if(answered&&q.ans===oi){bg="#D1FAE5";border="1.5px solid #059669";col="#065F46";}
+                if(answered&&quizState[qi]===oi&&oi!==q.ans){bg="#FEE2E2";border="1.5px solid #DC2626";col="#991B1B";}
+                return <button key={oi} onClick={()=>!answered&&setQuizState(p=>({...p,[qi]:oi}))} disabled={answered} style={{
+                  display:"block",width:"100%",textAlign:"left",padding:"6px 10px",marginBottom:"4px",fontSize:"11px",
+                  background:bg,border,borderRadius:"5px",cursor:answered?"default":"pointer",color:col,fontWeight:(answered&&(q.ans===oi||quizState[qi]===oi))?600:400
+                }}>{String.fromCharCode(65+oi)}) {opt}{answered&&q.ans===oi?" ✅":""}{answered&&quizState[qi]===oi&&oi!==q.ans?" ❌":""}</button>;
+              })}
+            </div>;
+          })}
+        </Section>
+
+      </> : <>
+        {/* CAPABILITY DETAIL */}
+        <div style={{display:"flex",alignItems:"center",gap:"10px",marginBottom:"12px",padding:"10px",background:`${c.color}0A`,borderRadius:"10px",border:`1px solid ${c.color}20`}}>
+          <div style={{fontSize:"28px",width:"46px",height:"46px",display:"flex",alignItems:"center",justifyContent:"center",background:`${c.color}12`,borderRadius:"10px"}}>{c.icon}</div>
+          <div>
+            <div style={{fontSize:"18px",fontWeight:800,color:c.color}}>{c.num}. {c.name} <span style={{fontSize:"12px",fontWeight:400,color:"var(--text-secondary,#6b7280)"}}>({c.nameEN})</span></div>
+            <div style={{fontSize:"10px",color:"var(--text-secondary,#6b7280)"}}>Capacidad del Modelo 6C de ITIL</div>
+          </div>
+        </div>
+
+        <Section title="DESCRIPCIÓN" color={c.color}>
+          <div style={{fontSize:"12px",lineHeight:1.6,padding:"0 4px"}}>{c.desc}</div>
+        </Section>
+
+        <Section title="EJEMPLOS OFICIALES" color={c.color}>
+          {c.examples.map((ex,i)=><div key={i} style={{display:"flex",gap:"5px",marginBottom:"3px",padding:"0 4px",fontSize:"11px"}}><span style={{color:c.color}}>●</span>{ex}</div>)}
+        </Section>
+
+        <Section title="🚗 EJEMPLO ICR" color={c.color}>
+          <div style={{padding:"8px 10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"6px",fontSize:"11px",lineHeight:1.6,borderLeft:`3px solid ${c.color}`}}>{c.icr}</div>
+        </Section>
+
+        <Section title="APLICACIÓN EN EL CICLO DE VIDA" color={c.color}>
+          {c.lifecycle.map((lc,i)=>{
+            const[act,desc]=lc.split(" — ");
+            return <div key={i} style={{display:"flex",gap:"6px",padding:"4px 8px",marginBottom:"3px",background:"var(--card-bg,#f8f9fa)",borderRadius:"4px",fontSize:"11px"}}>
+              <span style={{fontWeight:700,color:c.color,minWidth:"80px"}}>{act}</span>
+              <span>{desc}</span>
+            </div>;
+          })}
+        </Section>
+
+        <Section title="⚠️ NIVEL DE RIESGO" color={c.color}>
+          <div style={{padding:"8px 10px",background:c.risk.startsWith("ALTO")?"#FEE2E2":c.risk.startsWith("Alto")?"#FEF3C7":"var(--card-bg,#f8f9fa)",borderRadius:"6px",fontSize:"11px",lineHeight:1.5,borderLeft:`3px solid ${c.risk.startsWith("ALTO")||c.risk.startsWith("Alto")?"#DC2626":"#D97706"}`}}>
+            {c.risk}
+          </div>
+        </Section>
+
+        <div style={{marginTop:"12px"}}>
+          <button onClick={()=>setSel(null)} style={{padding:"8px 16px",fontSize:"12px",background:"var(--card-bg,#f0f0f0)",border:"1px solid var(--border-color,#d1d5db)",borderRadius:"6px",cursor:"pointer",fontWeight:600}}>← Volver a visión general</button>
+        </div>
+      </>}
+    </div>
+  </div>;
+}
+
+
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+  </script>
+  <script>
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('./sw.js').catch(()=>{});
+    }
+  </script>
+</body>
+</html>

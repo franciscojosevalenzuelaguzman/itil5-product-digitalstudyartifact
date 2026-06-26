@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
+  <meta name="theme-color" content="#1e1b4b">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="ITIL Conceptos">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icon.svg">
+  <title>ITIL v5 — Conceptos Fundacionales</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+    html{height:100%;overflow:hidden}
+    body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+      -webkit-font-smoothing:antialiased;height:100%;overflow:auto;
+      -webkit-overflow-scrolling:touch;overscroll-behavior:none}
+    #root{min-height:100vh;min-height:100dvh;
+      padding-top:env(safe-area-inset-top,0);
+      padding-bottom:env(safe-area-inset-bottom,0)}
+    button{font-family:inherit;-webkit-tap-highlight-color:transparent}
+    @media(prefers-color-scheme:dark){
+      :root{--bg-color:#0f172a;--card-bg:#1e293b;--text-color:#e2e8f0;
+        --text-secondary:#94a3b8;--border-color:#334155}
+      body{background:#0f172a;color:#e2e8f0}
+    }
+    @media(prefers-color-scheme:light){
+      :root{--bg-color:#fff;--card-bg:#f8f9fa;--text-color:#1a1a2e;
+        --text-secondary:#6b7280;--border-color:#e5e7eb}
+      body{background:#fff;color:#1a1a2e}
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script type="text/babel">
+    const { useState } = React;
+
+
+const tabs=[
+  {id:"principles",name:"7 Principios Guía",icon:"💎"},
+  {id:"dimensions",name:"4 Dimensiones",icon:"📐"},
+  {id:"vs",name:"Sistema de Valor",icon:"⚙️"},
+  {id:"prodserv",name:"Producto vs Servicio",icon:"🔗"},
+  {id:"value",name:"Co-creación de Valor",icon:"🤝"},
+  {id:"devops",name:"ITIL + DevOps",icon:"🔄"},
+  {id:"traps",name:"Trampas y Quiz",icon:"🧠"}
+];
+
+const principles=[
+  {n:"Enfocarse en el valor",en:"Focus on value",color:"#7C3AED",
+    d:"Cada actividad, decisión y cambio debe aportar valor a clientes y partes interesadas. Todo lo que la organización hace debe vincularse directa o indirectamente con valor para alguien.",
+    icr:[
+      "Anna mide el éxito de cada funcionalidad según resultados reales para clientes, no según opiniones internas del equipo.",
+      "Cuando los datos de uso revelaron que funciones «esenciales» apenas se usaban, ICR rediseñó la priorización basándose en lo que realmente importaba a los clientes.",
+      "La visión de Max: 'ICR es más que un servicio. Estamos aquí para mejorar toda la experiencia de viaje.'"
+    ],
+    activities:[
+      {act:"Descubrir",how:"Validar que cada iniciativa del roadmap esté vinculada a valor para el consumidor."},
+      {act:"Diseñar",how:"Diseñar para RESULTADOS del usuario, no solo funcionalidades técnicas."},
+      {act:"Entregar",how:"Medir la entrega contra satisfacción del cliente, no contra cumplimiento interno."}
+    ],
+    trap:"No es solo 'valor para el cliente final' — incluye valor para TODAS las partes interesadas (empleados, accionistas, socios, reguladores).",
+    antipattern:"Construir funcionalidades porque el equipo las considera importantes, sin validar con datos de uso real."
+  },
+  {n:"Empezar donde uno se encuentre",en:"Start where you are",color:"#2563EB",
+    d:"Evaluar lo que ya existe (capacidades actuales, datos y prácticas) antes de crear algo nuevo. No descartar lo que ya funciona sin antes entenderlo.",
+    icr:[
+      "Antes de rediseñar la app, Maria evaluó los patrones EXISTENTES de comportamiento de usuarios y las capacidades internas de ICR.",
+      "Para el sistema HR, Omar evaluó los sistemas heredados existentes antes de proponer una nueva plataforma.",
+      "Sam usó las capacidades de flota existentes de ICR como base para integrar los nuevos servicios de car-sharing y autónomos."
+    ],
+    activities:[
+      {act:"Descubrir",how:"Analizar capacidades actuales y servicios existentes ANTES de proponer nuevos productos."},
+      {act:"Adquirir",how:"Verificar qué recursos internos ya están disponibles antes de comprar externamente."},
+      {act:"Operar",how:"Usar datos operativos actuales como línea base antes de cambiar umbrales o procesos."}
+    ],
+    trap:"No significa 'no cambiar nada' — significa evaluar PRIMERO y decidir qué conservar, qué adaptar y qué reemplazar.",
+    antipattern:"Descartar todos los sistemas existentes y construir desde cero sin evaluar qué funcionaba bien."
+  },
+  {n:"Progresar de forma iterativa con retroalimentación",en:"Progress iteratively with feedback",color:"#059669",
+    d:"Trabajar en pasos pequeños y manejables, usando retroalimentación para refinar. Cada iteración produce algo útil, se evalúa, y se ajusta el siguiente paso.",
+    icr:[
+      "Sam y Omar construyeron la app de forma incremental: releases pequeños, pruebas continuas, feedback rápido.",
+      "El diseño incorporó retroalimentación de pruebas tempranas con usuarios reales antes de finalizar los flujos.",
+      "Bajo presión de tiempo en Descubrir, Maria recomendó probar y desafiar supuestos RÁPIDAMENTE con evidencia de usuarios reales — no saltarse la validación.",
+      "El ciclo Descubrir→Soporte es continuo: feedback de Soporte alimenta nuevas iteraciones de Descubrir."
+    ],
+    activities:[
+      {act:"Descubrir",how:"Iteraciones pequeñas y frecuentes; ajustar planes y financiamiento continuamente."},
+      {act:"Diseñar",how:"Prototipado iterativo con validación de usuarios en cada ciclo."},
+      {act:"Construir",how:"Integración continua, releases incrementales, pruebas automatizadas por ciclo."},
+      {act:"Dar soporte",how:"Cada incidente genera aprendizaje que alimenta la siguiente iteración de Descubrir/Diseñar."}
+    ],
+    trap:"Iterativo NO es lo mismo que 'sin plan'. Hay dirección clara, pero la ejecución es en pasos pequeños con feedback constante.",
+    antipattern:"Planificar todo en detalle al inicio y ejecutar sin detenerse a validar (waterfall rígido sin feedback loops)."
+  },
+  {n:"Colaborar y promover la visibilidad",en:"Collaborate and promote visibility",color:"#D97706",
+    d:"Involucrar a las personas adecuadas y hacer transparente el trabajo. La colaboración entre equipos, roles y organizaciones mejora resultados. La visibilidad previene decisiones basadas en información incompleta.",
+    icr:[
+      "Sam organizó sesiones de descubrimiento con stakeholders de TODA la organización, no solo TI.",
+      "La visión de la app unificada se comunicó a TODOS los equipos de producto, estableciendo alineación.",
+      "Omar participó tempranamente en Construir para preparar operaciones — no esperó a que le 'entregaran' el producto.",
+      "Anna, Maria, Sam, Omar y Álex colaboraron a lo largo de TODO el ciclo de vida, cada uno aportando su perspectiva."
+    ],
+    activities:[
+      {act:"Descubrir",how:"Sesiones con stakeholders diversos (negocio, TI, legal, operaciones, clientes)."},
+      {act:"Construir",how:"Omar (operaciones) involucrado desde el inicio, no al final — evita 'entregar un producto terminado 2 días antes del lanzamiento'."},
+      {act:"Transición",how:"Comunicar a clientes que servicios se MEJORAN, no se interrumpen."},
+      {act:"Dar soporte",how:"'El silencio daña la confianza más que el problema en sí' — comunicar siempre durante incidentes."}
+    ],
+    trap:"Visibilidad incluye hacer visible el trabajo EN PROGRESO, no solo los resultados finales. También aplica a hacer visibles los riesgos y problemas.",
+    antipattern:"Equipos que trabajan en silos y solo se comunican al entregar resultados finales."
+  },
+  {n:"Pensar y trabajar holísticamente",en:"Think and work holistically",color:"#BE185D",
+    d:"Considerar el sistema completo (personas, procesos, socios, tecnología) porque ningún elemento funciona de forma aislada. Cambios en un área impactan otras áreas.",
+    icr:[
+      "ICR consideró las 4 Dimensiones al diseñar la app: equipos (personas), cloud/AI (tecnología), proveedores de pagos/mapas (socios), flujos de reserva-a-devolución (procesos).",
+      "Un fallo del procesador de pagos apareció al consumidor como fallo de ICR — la dimensión 'socios' afecta directamente la 'experiencia'.",
+      "Álex evaluó las implicaciones arquitectónicas de gestionar 3 modelos de servicio en una plataforma — sin visión holística, habría 3 apps desconectadas.",
+      "La transformación de ICR se extendió más allá de productos orientados al cliente, abarcando sistemas internos como HR."
+    ],
+    activities:[
+      {act:"Diseñar",how:"Considerar no solo cómo se ve el producto sino cómo se opera, soporta y evoluciona."},
+      {act:"Operar",how:"Monitorizar tanto infraestructura técnica COMO experiencia del cliente (no solo uno)."},
+      {act:"Ciclo E2E",how:"El Cap. 11 enfatiza gestión holística de extremo a extremo: estrategia→gobernanza→arquitectura→datos→AI→flujos→proveedores como un sistema integrado."}
+    ],
+    trap:"Holístico aplica a las 4 Dimensiones Y a todo el ciclo de vida E2E, no solo a un proyecto o a una actividad individual.",
+    antipattern:"Optimizar la velocidad de Build sin considerar el impacto en Transición, Operación y Soporte."
+  },
+  {n:"Mantenerlo simple y práctico",en:"Keep it simple and practical",color:"#4F46E5",
+    d:"Eliminar la complejidad innecesaria; centrarse solo en lo que realmente aporta valor y es necesario para lograr los resultados. Menos pasos, menos burocracia, más enfoque.",
+    icr:[
+      "ICR creó UNA app unificada en lugar de tres apps separadas — simplificando la experiencia para usuarios y la operación para equipos.",
+      "Los equipos aplicaron 'thin slices': flujos simplificados basados en uso real en vez de completitud especulativa de funcionalidades.",
+      "Para el mapeo de flujos de valor, ICR usó notas adhesivas en talleres colaborativos en vez de notaciones formales complicadas."
+    ],
+    activities:[
+      {act:"Diseñar",how:"Enviar 'thin slices' — versiones mínimas viables, no funcionalidades completas especulativas."},
+      {act:"Construir",how:"Build units atómicos y versionables que se prueban independientemente."},
+      {act:"Transición",how:"Automatizar lo que se pueda; simplificar lo que no se pueda automatizar."}
+    ],
+    trap:"Simple no significa 'fácil' ni 'sin esfuerzo'. Significa eliminar lo que NO aporta valor. A veces simplificar requiere más trabajo que mantener la complejidad.",
+    antipattern:"Agregar procesos, aprobaciones y documentación 'por si acaso' sin evaluar si aportan valor."
+  },
+  {n:"Optimizar y automatizar",en:"Optimize and automate",color:"#DC2626",
+    d:"Mejorar los flujos de trabajo y automatizar de forma estratégica para aumentar eficiencia y liberar personas para tareas de mayor valor. PRIMERO optimizar, LUEGO automatizar.",
+    icr:[
+      "ICR automatizó monitorización, pruebas, despliegues CI/CD y soporte con chatbots.",
+      "Omar usó la automatización para detectar problemas ANTES de que se convirtieran en incidentes graves.",
+      "Antes de implementar AIOps, ICR debía primero mejorar la estructura de datos, observabilidad y la higiene de eventos (SP1 Q34).",
+      "Anna diseñó métricas, mecanismos de feedback y puntos de analytics en el diseño DESDE EL INICIO."
+    ],
+    activities:[
+      {act:"Construir",how:"CI/CD automatizado; pruebas automatizadas; feature toggles para releases seguros."},
+      {act:"Operar",how:"Auto-escalado de infraestructura; monitorización predictiva; alertas automáticas."},
+      {act:"Dar soporte",how:"Chatbots para soporte L1; correlación automática de incidentes; sugerencia de causa raíz por IA."},
+      {act:"Entregar",how:"Self-service para solicitudes comunes; onboarding automatizado con escalamiento humano."}
+    ],
+    trap:"Primero OPTIMIZAR, luego automatizar. Automatizar un proceso malo solo produce errores más rápido. 'Optimizar y automatizar' es un solo principio, no dos separados.",
+    antipattern:"Desplegar IA o automatización sobre procesos no optimizados, datos inconsistentes o alertas duplicadas."
+  }
+];
+
+const dimensions=[
+  {n:"Organizaciones y personas",en:"Organizations and people",color:"#7C3AED",
+    d:"Roles, responsabilidades, habilidades, cultura y comunicación. Las personas deben entender su rol en la cadena de valor y operar en una cultura de colaboración y mejora continua.",
+    icr:[
+      "Max (CIO) contratado por experiencia en ITIL y transformación digital. Su política de contratación refleja que valora la certificación ITIL.",
+      "Sam lidera producto E2E; Anna gestiona PM con foco B2C; Maria hace BA enfocada en descubrimiento; Omar gestiona entrega; Álex asegura la arquitectura.",
+      "Propiedad clara: cada persona tiene un rol definido, pero todos colaboran a lo largo del ciclo de vida."
+    ],
+    neglect:"Incluso la tecnología más fiable fallará en entregar valor si los equipos de soporte de primera línea no están capacitados o si la comunicación entre desarrolladores y operadores se rompe.",
+    questions:["¿La forma en que la organización está estructurada soporta su estrategia?","¿Los roles y responsabilidades están bien definidos?","¿La cultura apoya la colaboración y la mejora continua?"]
+  },
+  {n:"Información y tecnología",en:"Information and technology",color:"#2563EB",
+    d:"Datos, aplicaciones, infraestructura y herramientas. La tecnología proporciona las plataformas sobre las que se crean y ejecutan productos/servicios. Los datos guían la toma de decisiones. Los sistemas deben ser no solo disponibles y seguros, sino también observables y adaptables.",
+    icr:[
+      "La app depende de geolocalización, pasarelas de pago y plataformas móviles — si cualquier elemento falla, toda la experiencia se compromete.",
+      "ICR usa AI/ML para mantenimiento predictivo, ruteo inteligente, check-in/return inteligentes, y soporte al cliente.",
+      "La gobernanza de datos es crítica: GDPR, CCPA, y requisitos de residencia de datos por jurisdicción."
+    ],
+    neglect:"Datos de mala calidad o monitorización débil pueden cegar a los proveedores ante riesgos emergentes. La IA sin gobernanza de datos introduce riesgos de sesgo y cumplimiento.",
+    questions:["¿La organización tiene gobernanza efectiva de datos y seguridad?","¿Qué competencias de IA son necesarias y qué riesgos introducen?","¿La calidad de datos es suficiente para soportar decisiones con IA?"]
+  },
+  {n:"Socios y proveedores",en:"Partners and suppliers",color:"#059669",
+    d:"Contribuciones externas que hacen viables los servicios: cloud, SaaS, contratistas, socios. La integración sólida asegura que los compromisos de nivel de servicio estén respaldados por acuerdos subyacentes.",
+    icr:[
+      "ICR depende de proveedores de mapas, procesadores de pagos e infraestructura cloud en cada mercado.",
+      "Un fallo del proveedor de pagos apareció al consumidor como fallo de ICR — la debilidad en esta dimensión crea brechas de responsabilidad.",
+      "La incorporación de proveedores fue CRÍTICA durante Transición: cada uno necesitaba entender su rol en producción.",
+      "Contratos transparentes, gestión activa de relaciones y actividades de mejora compartidas son claves para mantener la confianza del consumidor."
+    ],
+    neglect:"Un fallo de pago puede parecer al consumidor un fallo del proveedor del servicio, aunque la causa esté en un gateway de terceros. Sin integración sólida de proveedores, la confianza se erosiona.",
+    questions:["¿Los contratos de proveedores están alineados con los SLAs comprometidos a clientes?","¿Hay rutas de escalamiento claras cuando un proveedor falla?","¿Se gestiona activamente el riesgo de lock-in?"]
+  },
+  {n:"Flujos de valor y procesos",en:"Value streams and processes",color:"#D97706",
+    d:"Cómo se organizan las actividades para lograr resultados. Los procesos dan estructura y repetibilidad. Los flujos de valor hacen visible el flujo E2E. Mapear flujos, identificar cuellos de botella y eliminar desperdicio.",
+    icr:[
+      "ICR mapeó el recorrido del usuario E2E: desde búsqueda hasta devolución del vehículo, identificando puntos de fricción.",
+      "Si el onboarding de un usuario requiere 5 aprobaciones de distintos sistemas, las demoras frustran y reducen la adopción.",
+      "Los flujos de valor son la secuencia REAL de actividades realizadas, no un modelo predeterminado. Se mapean 'as-is', no 'as-designed'.",
+      "Métricas clave del flujo: cycle time (por paso), wait time (entre pasos), lead time (total E2E), flow efficiency (% tiempo productivo vs total)."
+    ],
+    neglect:"Procesos diseñados sin mapeo real de flujos de valor generan actividades que no agregan valor ('desperdicio'). Optimizar un paso individual puede empeorar el flujo E2E si crea un cuello de botella aguas abajo.",
+    questions:["¿Se han mapeado los flujos de valor reales (as-is) o solo los diseñados?","¿Dónde están los cuellos de botella y los tiempos de espera más largos?","¿Qué actividades no agregan valor desde la perspectiva del cliente?"]
+  }
+];
+
+const vsComponents=[
+  {n:"Principios guía",d:"Apoyan a la organización en toda circunstancia; guían decisiones a todos los niveles independientemente de cambios en metas o estructura.",icon:"💎",
+    icr:"Los 7 principios son el 'DNA cultural' de ICR: desde 'enfocarse en el valor' al medir éxito por resultados de clientes, hasta 'optimizar y automatizar' con CI/CD y AIOps.",
+    detail:"Son UNIVERSALES — aplican a toda actividad, decisión y circunstancia. No son situacionales."},
+  {n:"Gobernanza",d:"Dirige, controla y asegura que la gestión sea efectiva, eficiente, sostenible y alineada con requisitos y regulaciones.",icon:"🏛️",
+    icr:"ICR combina dirección global clara con autonomía local — cada país puede adaptar servicios a regulación local pero dentro del marco global de ICR. La junta define objetivos estratégicos y apetito de riesgo.",
+    detail:"Gobernanza NO es lo mismo que gestión. Gobernanza DIRIGE y CONTROLA; la gestión EJECUTA."},
+  {n:"Cadena de valor",d:"Conjunto de actividades que habilita el valor a través de la provisión de productos/servicios. 8 actividades: Descubrir, Diseñar, Adquirir, Construir, Transición, Operar, Entregar, Dar soporte.",icon:"🔗",
+    icr:"ICR ejecuta las 8 actividades para su app unificada — desde descubrir necesidades de 3 tipos de usuarios hasta dar soporte cuando el procesador de pagos falla.",
+    detail:"Es el componente CENTRAL del VS. NO es una secuencia fija — las actividades se combinan según el contexto formando flujos de valor."},
+  {n:"Prácticas",d:"34 prácticas de gestión que combinan recursos de las 4 Dimensiones para formar las capacidades de gestión requeridas. 22 de producto/servicio + 12 generales.",icon:"🧰",
+    icr:"ICR usa prácticas como gestión de incidentes (restaurar pagos), gestión de releases (despliegues graduales), monitorización (detectar errores de autenticación) y mejora continua (feedback→Descubrir).",
+    detail:"Cada práctica COMBINA recursos de las 4 Dimensiones. No son procesos aislados — se integran en el sistema de valor."},
+  {n:"Mejora continua",d:"Actividad recurrente a todos los niveles para asegurar que el rendimiento cumpla expectativas. Opera en el contexto de los principios guía.",icon:"🔄",
+    icr:"En ICR, el ciclo Descubrir→Soporte no es lineal sino CÍCLICO. Feedback de Soporte alimenta nuevas iteraciones de Descubrir. Datos de Operar informan mejoras de Diseño. Insights de Entregar moldean priorización de funcionalidades.",
+    detail:"Aplica a TODOS los niveles: estratégico, táctico y operativo. No es solo una práctica — es un componente del sistema de valor."}
+];
+
+const prodServ={
+  chain:[
+    {l:"Recursos\ntecnológicos",c:"#6b7280",d:"Hardware, software, datos, conectividad, infraestructura.",icr:"Servidores cloud, APIs de mapas, SDKs de pagos, bases de datos de flota."},
+    {l:"Productos\ndigitales",c:"#7C3AED",d:"Combinación de recursos diseñada para ofrecer valor. Palabras clave: 'combinación' y 'diseñada'.",icr:"La Unified Mobile App de ICR — combina recursos cloud, AI, pagos y mapas en una plataforma."},
+    {l:"Ofertas\nde servicio",c:"#2563EB",d:"Descripción formal de servicios diseñados para un grupo de consumidores. Puede incluir bienes, acceso a recursos y acciones de servicio.",icr:"Alquiler tradicional, car-sharing, transporte autónomo — cada uno es una oferta de servicio basada en la app."},
+    {l:"Servicios\ndigitales",c:"#059669",d:"Servicio que depende total o mayoritariamente de productos digitales. Aquí es donde se REALIZA el valor.",icr:"Cuando un cliente reserva, desbloquea y devuelve un vehículo a través de la app — ESO es el servicio digital en acción."}
+  ],
+  roles:[
+    {r:"Product vendor",d:"Crea y mejora continuamente productos digitales y ofertas de servicio.",icr:"ICR como creador de la Unified Mobile App.",trap:"Un vendor puede también ser service provider (ICR lo es)."},
+    {r:"Service provider",d:"Entrega y da soporte a servicios.",icr:"ICR como proveedor de servicios de movilidad a los clientes finales.",trap:"Puede delegar actividades a proveedores internos o externos."},
+    {r:"Service consumer",d:"Adquiere y usa servicios. Incluye 3 sub-roles: customer (autoriza), user (usa), sponsor (financia).",icr:"Los millones de clientes que reservan vehículos en todo el mundo.",trap:"En B2B, customer/user/sponsor pueden ser personas diferentes."}
+  ]
+};
+
+const valueAspects=[
+  {n:"Utilidad (Utility)",sub:"Fitness for purpose",d:"El servicio HACE lo que el consumidor necesita. Se enfoca en las FUNCIONALIDADES.",icr:"La app permite buscar, reservar, desbloquear, usar y devolver vehículos; gestionar pagos; obtener soporte.",color:"#7C3AED",
+    examples:["Reserva en múltiples idiomas","Check-in/return inteligente","3 modelos de servicio en una app"]},
+  {n:"Garantía (Warranty)",sub:"Fitness for use",d:"El servicio es DISPONIBLE, SEGURO y FIABLE al estándar acordado. Se enfoca en CÓMO se desempeña.",icr:"SLAs comprometen reserva rápida, acceso fiable a vehículos, y soporte responsivo. Disponibilidad, capacidad, seguridad y continuidad.",color:"#2563EB",
+    examples:["99.9% uptime","Tiempo de respuesta <2s","Cifrado de datos de pago","Plan de continuidad ante caída de proveedor cloud"]},
+  {n:"Sostenibilidad",sub:"Responsabilidad a largo plazo",d:"Servicio entregado responsablemente: eficiencia económica, uso de recursos, impactos ambientales y sociales a lo largo del ciclo de vida.",icr:"ICR estableció objetivos de sostenibilidad claros y ambiciosos. La flota incluye vehículos eléctricos. Reducción de huella de carbono en operaciones digitales.",color:"#059669",
+    examples:["Flota eléctrica","Optimización de rutas para reducir emisiones","Data centers eficientes energéticamente"]},
+  {n:"Experiencia (Experience)",sub:"Percepción durante la interacción",d:"Cómo se PERCIBE el servicio durante la interacción. NO se puede garantizar directamente — solo sus indicadores proxy pueden acordarse y monitorizarse.",icr:"Anna monitorizó patrones de uso, abandono de flujos y satisfacción. Los datos contradijeron supuestos: funcionalidades 'esenciales' apenas se usaban.",color:"#D97706",
+    examples:["NPS y CSAT scores","Tasa de abandono por pantalla","Tiempo de completitud de tareas","Análisis de sentimiento en reviews"]}
+];
+
+const devops={
+  core:"ITIL provee el FRAMEWORK para gestión de productos/servicios digitales. DevOps provee PRÁCTICAS Y TÉCNICAS complementarias que mejoran las actividades del ciclo de vida. No se reemplazan mutuamente.",
+  shared:["Enfoque en valor","Progreso iterativo con feedback","Colaboración transparente"],
+  activities:[
+    {act:"Descubrir",how:"Continuous discovery; feedback loops desde producción hacia producto."},
+    {act:"Diseñar",how:"Design thinking integrado con pipelines de validación continua."},
+    {act:"Adquirir",how:"Infrastructure as Code; aprovisionamiento declarativo y reproducible."},
+    {act:"Construir",how:"CI/CD; trunk-based development; automated testing; shift-left security."},
+    {act:"Transición",how:"Continuous deployment; feature flags; canary releases; blue-green deployments."},
+    {act:"Operar",how:"SRE practices; observability; chaos engineering; error budgets; auto-remediación."}
+  ],
+  icrExample:"ICR integra DevOps a lo largo del ciclo: CI/CD para la app, IaC para infraestructura multiregión, monitoring-as-code para observabilidad, y feedback continuo de producción hacia el backlog de producto.",
+  trap:"DevOps NO se limita a Build — aplica a 6 de las 8 actividades. En el examen, la respuesta correcta es que ITIL provee el framework y DevOps las prácticas y técnicas (SP1 Q13)."
+};
+
+const defs=[
+  {t:"Valor",d:"Los beneficios, la utilidad y la importancia percibidos de algo.",ej:"Para un cliente ICR: poder reservar un auto en 30 segundos desde su celular."},
+  {t:"Producto digital",d:"Combinación de recursos basada en tecnología digital y diseñada para ofrecer valor a consumidores.",ej:"La Unified Mobile App de ICR."},
+  {t:"Servicio digital",d:"Servicio que depende total o mayoritariamente de productos digitales.",ej:"El servicio de alquiler de vehículos accesible a través de la app."},
+  {t:"Oferta de servicio",d:"Descripción formal de servicios para un grupo de consumidores objetivo. Puede incluir bienes, acceso a recursos y acciones de servicio.",ej:"Alquiler tradicional, car-sharing, transporte autónomo — tres ofertas distintas."},
+  {t:"Cadena de valor",d:"Conjunto completo de actividades que habilita el valor a través de la provisión de un producto o servicio.",ej:"Las 8 actividades de ICR: Descubrir→...→Dar soporte."},
+  {t:"Flujo de valor",d:"Serie de pasos que una organización usa para crear y entregar productos/servicios. Es la secuencia REAL, no un blueprint.",ej:"El flujo real desde que un cliente busca un auto hasta que lo devuelve."},
+  {t:"Resultado (Outcome)",d:"Un resultado para una parte interesada habilitado por una o más salidas.",ej:"El cliente llega a su destino de forma segura y a tiempo."},
+  {t:"Salida (Output)",d:"Un entregable tangible o intangible de una actividad.",ej:"La confirmación de reserva, la factura, el reporte de incidente."},
+  {t:"Cocreación de valor",d:"El valor se cocrea entre proveedor y consumidor; no es algo que el proveedor 'entrega' solo.",ej:"ICR provee la app y los vehículos; el cliente aporta feedback, uso y pago. Ambos contribuyen."},
+  {t:"SLA",d:"Acuerdo documentado entre proveedor y cliente que identifica servicios requeridos y nivel esperado.",ej:"Reserva completada en <30s, disponibilidad 99.9%, soporte en <4h."},
+  {t:"PESTLE",d:"Factores Políticos, Económicos, Sociales, Tecnológicos, Legales y Ambientales que afectan el contexto externo.",ej:"Regulaciones de vehículos autónomos varían por país — afectan qué servicios puede ofrecer ICR en cada mercado."},
+  {t:"Las 4 Dimensiones",d:"Organizaciones y personas; Información y tecnología; Socios y proveedores; Flujos de valor y procesos.",ej:"ICR equilibra equipos capacitados + cloud/AI + proveedores de pagos + flujos optimizados."}
+];
+
+const allTraps=[
+  "El ITIL VS tiene 5 componentes. La cadena de valor es el CENTRAL. No confundir VS (sistema) con cadena de valor (un componente del sistema).",
+  "Producto digital PROVEE capacidades; servicio digital HABILITA la realización de valor a través del USO de esas capacidades. NO son sinónimos (SP1 Q2).",
+  "La cadena de valor NO es una secuencia fija lineal. Las actividades se combinan dinámicamente en flujos de valor según el contexto (SP1 Q3).",
+  "Los flujos de valor son la secuencia REAL de actividades, no un modelo predeterminado.",
+  "ITIL = framework; DevOps = prácticas complementarias. DevOps aplica a 6 actividades, NO solo a desarrollo (SP1 Q13).",
+  "Las 4 Dimensiones son internas; PESTLE es externo. Las dimensiones están AFECTADAS por factores PESTLE.",
+  "Experiencia NO se puede garantizar — solo sus PROXIES (tiempos de respuesta, usabilidad, satisfacción) pueden acordarse.",
+  "'Optimizar y automatizar' es UN SOLO principio. Primero optimizar, LUEGO automatizar. Automatizar basura produce basura más rápido.",
+  "Gobernanza DIRIGE y CONTROLA; la gestión EJECUTA. No son lo mismo.",
+  "Las 34 prácticas combinan recursos de las 4 Dimensiones — no son procesos independientes.",
+  "Outcome ≠ Output. Output es lo que produces (un reporte); Outcome es el resultado para el stakeholder (mejor decisión)."
+];
+
+const allQuiz=[
+  {q:"¿Cuál es la diferencia conceptual entre producto digital y servicio digital?",o:["Son sinónimos","El producto provee capacidades; el servicio habilita realización de valor a través del uso","El producto entrega valor directamente; el servicio soporta operaciones internas","El producto define resultados; el servicio define recursos técnicos"],a:1},
+  {q:"¿Cómo soportan las actividades de la cadena de valor el ciclo de vida?",o:["Definiendo estructuras de gobernanza","Habilitando actividades de gestión del ciclo de vida que crean y entregan valor","Alineando etapas con ejecución operativa de procesos","Secuenciando actividades en proceso lineal fijo"],a:1},
+  {q:"¿Cuáles son los 5 componentes del Sistema de Valor de ITIL?",o:["Principios, Gobernanza, Cadena de valor, Prácticas, Mejora continua","Principios, Estrategia, Cadena de valor, Procesos, Automatización","Gobernanza, Cadena de valor, Prácticas, AI, Mejora continua","Principios, Dimensiones, Cadena de valor, Prácticas, PESTLE"],a:0},
+  {q:"¿Qué principio dice 'evaluar lo que ya existe antes de crear algo nuevo'?",o:["Enfocarse en el valor","Empezar donde uno se encuentre","Progresar iterativamente","Mantenerlo simple"],a:1},
+  {q:"¿Cómo colaboran ITIL y DevOps?",o:["ITIL provee el framework; DevOps prácticas y técnicas complementarias","ITIL reemplaza DevOps","DevOps se limita a desarrollo de software","DevOps es gobernanza sobre ITIL"],a:0},
+  {q:"¿Las 4 características que moldean percepción de valor son...?",o:["Utilidad, garantía, sostenibilidad y experiencia","Utilidad, garantía, seguridad y disponibilidad","Funcionalidad, rendimiento, seguridad y costo","Diseño, construcción, operación y soporte"],a:0},
+  {q:"¿Se puede garantizar la 'experiencia' de un servicio?",o:["Sí, con SLAs detallados","No — solo sus proxies pueden acordarse y monitorizarse"],a:1},
+  {q:"¿Qué principio dice 'primero optimizar, luego automatizar'?",o:["Progresar iterativamente","Mantenerlo simple","Optimizar y automatizar","Pensar holísticamente"],a:2},
+  {q:"Los flujos de valor son...",o:["Un modelo predeterminado que define cómo debe ejecutarse el trabajo","La secuencia REAL de actividades realizadas, no un blueprint predeterminado"],a:1},
+  {q:"¿La gobernanza y la gestión son lo mismo?",o:["Sí, son sinónimos","No — gobernanza dirige y controla; gestión ejecuta"],a:1},
+  {q:"¿Outcome y Output son lo mismo?",o:["Sí","No — Output es el entregable; Outcome es el resultado para el stakeholder"],a:1},
+  {q:"Un fallo de pagos causado por un proveedor externo aparece al usuario como fallo de ICR. ¿Qué dimensión está descuidada?",o:["Organizaciones y personas","Información y tecnología","Socios y proveedores","Flujos de valor y procesos"],a:2}
+];
+
+const S=({title,color="#4F46E5",children,open:io=true})=>{
+  const[o,setO]=useState(io);
+  return <div style={{marginBottom:"10px"}}>
+    <button onClick={()=>setO(!o)} style={{display:"flex",alignItems:"center",gap:"7px",width:"100%",background:"none",border:"none",cursor:"pointer",padding:"7px 0",borderBottom:`2px solid ${color}`,marginBottom:o?"8px":0}}>
+      <span style={{fontSize:"9px",color,transform:o?"rotate(90deg)":"rotate(0)",transition:"transform .15s"}}>▶</span>
+      <span style={{fontSize:"13px",fontWeight:700,color}}>{title}</span>
+    </button>
+    {o&&children}
+  </div>;
+};
+
+const App = function App(){
+  const[tab,setTab]=useState("principles");
+  const[qs,setQs]=useState({});
+
+  return <div style={{fontFamily:"'Inter',-apple-system,sans-serif",color:"var(--text-color,#1a1a2e)",minHeight:"100vh"}}>
+    <div style={{background:"linear-gradient(135deg,#1e1b4b,#312e81)",padding:"16px 14px 12px",borderRadius:"0 0 14px 14px",color:"#fff",marginBottom:"12px"}}>
+      <div style={{fontSize:"17px",fontWeight:800}}>ITIL Product v5 — Conceptos Fundacionales</div>
+      <div style={{fontSize:"11px",opacity:.65,marginBottom:"10px"}}>Módulo 1 · Cap. 1-2 Official Book · ~8 preguntas del examen</div>
+      <div style={{display:"flex",gap:"4px",overflowX:"auto",paddingBottom:"3px"}}>
+        {tabs.map(s=><button key={s.id} onClick={()=>setTab(s.id)} style={{padding:"5px 9px",fontSize:"10px",fontWeight:tab===s.id?700:500,whiteSpace:"nowrap",background:tab===s.id?"rgba(255,255,255,.2)":"rgba(255,255,255,.06)",color:"#fff",border:tab===s.id?"2px solid rgba(255,255,255,.4)":"1px solid rgba(255,255,255,.12)",borderRadius:"5px",cursor:"pointer",opacity:tab===s.id?1:.6}}>{s.icon} {s.name}</button>)}
+      </div>
+    </div>
+
+    <div style={{padding:"0 10px 20px"}}>
+      {tab==="principles"&&<>
+        <div style={{fontSize:"12px",lineHeight:1.6,marginBottom:"10px",padding:"8px 10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"8px"}}>Los 7 principios guía apoyan a la organización en <strong>toda circunstancia</strong>. Son UNIVERSALES — aplican a toda actividad, decisión y nivel organizacional.</div>
+        {principles.map((p,i)=><div key={i} style={{padding:"10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"8px",marginBottom:"8px",borderLeft:`4px solid ${p.color}`}}>
+          <div style={{fontSize:"14px",fontWeight:700,color:p.color}}>{i+1}. {p.n}</div>
+          <div style={{fontSize:"10px",color:"var(--text-secondary,#6b7280)",marginBottom:"4px"}}>{p.en}</div>
+          <div style={{fontSize:"11px",lineHeight:1.5,marginBottom:"8px"}}>{p.d}</div>
+          <S title="🚗 Ejemplos ICR" color={p.color} open={false}>
+            {p.icr.map((ex,j)=><div key={j} style={{fontSize:"10px",padding:"3px 8px",marginBottom:"3px",background:`${p.color}06`,borderRadius:"3px",lineHeight:1.4}}>• {ex}</div>)}
+          </S>
+          <S title="📋 Cómo aplica por actividad" color={p.color} open={false}>
+            {p.activities.map((a,j)=><div key={j} style={{display:"flex",gap:"6px",marginBottom:"3px",fontSize:"10px"}}><span style={{fontWeight:700,color:p.color,minWidth:"70px"}}>{a.act}</span><span>{a.how}</span></div>)}
+          </S>
+          <div style={{display:"flex",gap:"6px",marginTop:"6px"}}>
+            <div style={{flex:1,fontSize:"10px",padding:"4px 8px",background:"#FEF3C7",borderRadius:"4px",lineHeight:1.4}}>⚠️ <strong>Trampa:</strong> {p.trap}</div>
+          </div>
+          <div style={{fontSize:"10px",padding:"4px 8px",background:"#FEE2E2",borderRadius:"4px",marginTop:"4px",lineHeight:1.4}}>❌ <strong>Antipatrón:</strong> {p.antipattern}</div>
+        </div>)}
+      </>}
+
+      {tab==="dimensions"&&<>
+        <div style={{fontSize:"12px",lineHeight:1.6,marginBottom:"10px",padding:"8px 10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"8px"}}>Las 4 Dimensiones son <strong>interdependientes</strong>. Descuidar una debilita todo el sistema. Cada dimensión está afectada por factores <strong>PESTLE</strong> externos.</div>
+        {dimensions.map((dim,i)=><div key={i} style={{padding:"10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"8px",marginBottom:"8px",borderLeft:`4px solid ${dim.color}`}}>
+          <div style={{fontSize:"14px",fontWeight:700,color:dim.color}}>{i+1}. {dim.n}</div>
+          <div style={{fontSize:"10px",color:"var(--text-secondary,#6b7280)",marginBottom:"4px"}}>{dim.en}</div>
+          <div style={{fontSize:"11px",lineHeight:1.5,marginBottom:"8px"}}>{dim.d}</div>
+          <S title="🚗 Ejemplos ICR" color={dim.color} open={false}>
+            {dim.icr.map((ex,j)=><div key={j} style={{fontSize:"10px",padding:"3px 8px",marginBottom:"3px",background:`${dim.color}06`,borderRadius:"3px",lineHeight:1.4}}>• {ex}</div>)}
+          </S>
+          <div style={{fontSize:"10px",padding:"5px 8px",background:"#FEE2E2",borderRadius:"4px",marginBottom:"6px",lineHeight:1.4}}>❌ <strong>Si se descuida:</strong> {dim.neglect}</div>
+          <S title="Preguntas diagnósticas" color={dim.color} open={false}>
+            {dim.questions.map((q,j)=><div key={j} style={{fontSize:"10px",marginBottom:"2px"}}>❓ {q}</div>)}
+          </S>
+        </div>)}
+      </>}
+
+      {tab==="vs"&&<>
+        <div style={{fontSize:"12px",lineHeight:1.6,marginBottom:"10px",padding:"8px 10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"8px"}}>El <strong>Sistema de Valor de ITIL (ITIL VS)</strong> combina gobernanza y gestión en un sistema que transforma <strong>oportunidad/demanda</strong> en <strong>valor</strong>.</div>
+        <div style={{display:"flex",flexWrap:"wrap",justifyContent:"center",gap:"6px",marginBottom:"14px"}}>
+          <div style={{padding:"8px 14px",background:"#DC2626",color:"#fff",borderRadius:"20px",fontSize:"11px",fontWeight:700}}>Oportunidad / Demanda</div>
+          <span style={{alignSelf:"center",fontSize:"18px"}}>→</span>
+          <div style={{padding:"8px 14px",background:"#312e81",color:"#fff",borderRadius:"8px",fontSize:"11px",fontWeight:700}}>ITIL VS (5 componentes)</div>
+          <span style={{alignSelf:"center",fontSize:"18px"}}>→</span>
+          <div style={{padding:"8px 14px",background:"#059669",color:"#fff",borderRadius:"20px",fontSize:"11px",fontWeight:700}}>Valor</div>
+        </div>
+        {vsComponents.map((c,i)=><div key={i} style={{padding:"10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"8px",marginBottom:"6px",borderLeft:i===2?"4px solid #7C3AED":"2px solid var(--border-color,#d1d5db)"}}>
+          <div style={{display:"flex",gap:"8px",alignItems:"center",marginBottom:"4px"}}>
+            <span style={{fontSize:"18px"}}>{c.icon}</span>
+            <div style={{fontSize:"13px",fontWeight:700,color:i===2?"#7C3AED":"var(--text-color,#1a1a2e)"}}>{c.n} {i===2&&"← COMPONENTE CENTRAL"}</div>
+          </div>
+          <div style={{fontSize:"11px",lineHeight:1.5,marginBottom:"4px"}}>{c.d}</div>
+          <div style={{fontSize:"10px",padding:"4px 8px",background:i===2?"#7C3AED08":"var(--card-bg,#f0f0f0)",borderRadius:"4px",marginBottom:"4px",lineHeight:1.4}}>🚗 {c.icr}</div>
+          <div style={{fontSize:"10px",fontStyle:"italic",color:"var(--text-secondary,#6b7280)"}}>💡 {c.detail}</div>
+        </div>)}
+      </>}
+
+      {tab==="prodserv"&&<>
+        <S title="CADENA DE RELACIONES: Recursos → Productos → Ofertas → Servicios" color="#2563EB">
+          {prodServ.chain.map((s,i)=><div key={i} style={{padding:"8px 10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"6px",marginBottom:"5px",borderLeft:`4px solid ${s.c}`}}>
+            <div style={{fontSize:"12px",fontWeight:700,color:s.c}}>{s.l.replace("\n"," ")}</div>
+            <div style={{fontSize:"10px",lineHeight:1.4,marginBottom:"3px"}}>{s.d}</div>
+            <div style={{fontSize:"10px",fontStyle:"italic",color:"var(--text-secondary,#6b7280)"}}>🚗 {s.icr}</div>
+            {i<prodServ.chain.length-1&&<div style={{textAlign:"center",fontSize:"14px",color:"#9ca3af",margin:"4px 0"}}>↓ {["componen","habilitan y describen","soportan"][i]}</div>}
+          </div>)}
+          <div style={{fontSize:"10px",padding:"6px 10px",background:"#7C3AED08",borderRadius:"5px",borderLeft:"3px solid #7C3AED",lineHeight:1.5,marginTop:"6px"}}><strong>Clave del examen:</strong> Los productos proveen capacidades. Las ofertas describen el valor potencial. Cuando los clientes aceptan las ofertas, la entrega y el consumo comienzan. El valor se realiza en el SERVICIO, no en el producto.</div>
+        </S>
+        <S title="ROLES EN RELACIONES DE SERVICIO" color="#059669">
+          {prodServ.roles.map((r,i)=><div key={i} style={{padding:"8px 10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"6px",marginBottom:"5px",borderLeft:"3px solid #059669"}}>
+            <div style={{fontSize:"12px",fontWeight:700,color:"#059669"}}>{r.r}</div>
+            <div style={{fontSize:"10px",lineHeight:1.4}}>{r.d}</div>
+            <div style={{fontSize:"10px",fontStyle:"italic",color:"var(--text-secondary,#6b7280)"}}>🚗 {r.icr}</div>
+            <div style={{fontSize:"10px",padding:"3px 6px",background:"#FEF3C7",borderRadius:"3px",marginTop:"3px"}}>⚠️ {r.trap}</div>
+          </div>)}
+        </S>
+      </>}
+
+      {tab==="value"&&<>
+        <div style={{fontSize:"12px",lineHeight:1.6,marginBottom:"10px",padding:"8px 10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"8px"}}>El valor se <strong>cocrea</strong> entre proveedor y consumidor. 4 características moldean la percepción de valor. Deben <strong>equilibrarse e integrarse</strong> — no existen aisladas.</div>
+        {valueAspects.map((v,i)=><div key={i} style={{padding:"10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"8px",marginBottom:"8px",borderLeft:`4px solid ${v.color}`}}>
+          <div style={{fontSize:"14px",fontWeight:700,color:v.color}}>{v.n}</div>
+          <div style={{fontSize:"10px",color:"var(--text-secondary,#6b7280)",marginBottom:"4px"}}>{v.sub}</div>
+          <div style={{fontSize:"11px",lineHeight:1.5,marginBottom:"6px"}}>{v.d}</div>
+          <div style={{fontSize:"10px",padding:"4px 8px",background:`${v.color}08`,borderRadius:"4px",marginBottom:"4px"}}>🚗 {v.icr}</div>
+          <div style={{display:"flex",flexWrap:"wrap",gap:"3px"}}>{v.examples.map((e,j)=><span key={j} style={{fontSize:"9px",padding:"2px 6px",background:`${v.color}10`,color:v.color,borderRadius:"3px",fontWeight:600}}>• {e}</span>)}</div>
+        </div>)}
+        <div style={{fontSize:"10px",padding:"8px 10px",background:"#FEF3C7",borderRadius:"6px",borderLeft:"3px solid #D97706",lineHeight:1.5}}>⚠️ Utilidad fuerte sin experiencia = vacía. Garantía excelente sin sostenibilidad = pasivos a largo plazo. Diseño robusto con mala experiencia = impide adopción. El valor emerge del EQUILIBRIO.</div>
+      </>}
+
+      {tab==="devops"&&<>
+        <div style={{fontSize:"12px",lineHeight:1.6,marginBottom:"10px",padding:"8px 10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"8px"}}>{devops.core}</div>
+        <S title="PRINCIPIOS COMPARTIDOS" color="#4F46E5">
+          <div style={{display:"flex",gap:"4px",flexWrap:"wrap",marginBottom:"8px"}}>{devops.shared.map((s,i)=><span key={i} style={{padding:"4px 10px",fontSize:"10px",background:"#4F46E512",color:"#4F46E5",borderRadius:"4px",fontWeight:600}}>✓ {s}</span>)}</div>
+        </S>
+        <S title="DEVOPS APLICA A ESTAS 6 ACTIVIDADES" color="#2563EB">
+          {devops.activities.map((a,i)=><div key={i} style={{display:"flex",gap:"8px",padding:"5px 8px",marginBottom:"4px",borderLeft:"3px solid #2563EB",background:"var(--card-bg,#f8f9fa)",borderRadius:"4px"}}>
+            <span style={{fontSize:"11px",fontWeight:700,color:"#2563EB",minWidth:"75px"}}>{a.act}</span>
+            <span style={{fontSize:"10px"}}>{a.how}</span>
+          </div>)}
+          <div style={{fontSize:"10px",padding:"6px 8px",background:"#FEF3C7",borderRadius:"4px",marginTop:"6px",borderLeft:"3px solid #D97706",lineHeight:1.4}}>⚠️ Entregar y Dar soporte NO se listan explícitamente como actividades DevOps en el libro, aunque DevOps indirectamente las beneficia.</div>
+        </S>
+        <S title="🚗 ICR + DevOps" color="#059669">
+          <div style={{fontSize:"11px",lineHeight:1.5,padding:"6px 8px",background:"#05966908",borderRadius:"4px"}}>{devops.icrExample}</div>
+        </S>
+        <div style={{fontSize:"10px",padding:"8px 10px",background:"#FEE2E2",borderRadius:"6px",borderLeft:"3px solid #DC2626",marginTop:"8px",lineHeight:1.5}}>⚠️ <strong>Trampa del examen (SP1 Q13):</strong> {devops.trap}</div>
+      </>}
+
+      {tab==="traps"&&<>
+        <S title="📖 DEFINICIONES CLAVE CON EJEMPLOS" color="#4F46E5">
+          {defs.map((d,i)=><div key={i} style={{padding:"6px 10px",background:i%2===0?"var(--card-bg,#f8f9fa)":"transparent",borderRadius:"5px",marginBottom:"2px"}}>
+            <div><span style={{fontSize:"11px",fontWeight:700,color:"#4F46E5"}}>{d.t}: </span><span style={{fontSize:"11px"}}>{d.d}</span></div>
+            <div style={{fontSize:"10px",fontStyle:"italic",color:"var(--text-secondary,#6b7280)",marginTop:"2px"}}>🚗 {d.ej}</div>
+          </div>)}
+        </S>
+        <S title="⚠️ TRAMPAS DE EXAMEN (11 trampas)" color="#D97706">
+          {allTraps.map((t,i)=><div key={i} style={{display:"flex",gap:"5px",padding:"5px 8px",background:"#FEF3C7",borderRadius:"4px",marginBottom:"3px",fontSize:"10px",lineHeight:1.4,borderLeft:"3px solid #D97706"}}><span>⚠️</span><span>{t}</span></div>)}
+        </S>
+        <S title="🧠 AUTOEVALUACIÓN (12 preguntas)" color="#4F46E5">
+          {allQuiz.map((q,qi)=>{
+            const ans=qs[qi];const ok=ans===q.a;
+            return <div key={qi} style={{padding:"10px",background:"var(--card-bg,#f8f9fa)",borderRadius:"8px",marginBottom:"8px",border:ans!==undefined?(ok?"2px solid #059669":"2px solid #DC2626"):"1px solid var(--border-color,#e5e7eb)"}}>
+              <div style={{fontSize:"12px",fontWeight:700,marginBottom:"8px"}}>{qi+1}. {q.q}</div>
+              {q.o.map((opt,oi)=>{
+                let bg="transparent",brd="1px solid var(--border-color,#d1d5db)",col="var(--text-color,#1a1a2e)";
+                if(ans!==undefined&&q.a===oi){bg="#D1FAE5";brd="1.5px solid #059669";col="#065F46";}
+                if(ans!==undefined&&ans===oi&&oi!==q.a){bg="#FEE2E2";brd="1.5px solid #DC2626";col="#991B1B";}
+                return <button key={oi} onClick={()=>ans===undefined&&setQs(p=>({...p,[qi]:oi}))} disabled={ans!==undefined} style={{display:"block",width:"100%",textAlign:"left",padding:"6px 10px",marginBottom:"4px",fontSize:"11px",background:bg,border:brd,borderRadius:"5px",cursor:ans!==undefined?"default":"pointer",color:col,fontWeight:ans!==undefined&&(q.a===oi||ans===oi)?600:400}}>{String.fromCharCode(65+oi)}) {opt}{ans!==undefined&&q.a===oi?" ✅":""}{ans!==undefined&&ans===oi&&oi!==q.a?" ❌":""}</button>;
+              })}
+            </div>;
+          })}
+        </S>
+      </>}
+    </div>
+  </div>;
+}
+
+
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+  </script>
+  <script>
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('./sw.js').catch(()=>{});
+    }
+  </script>
+</body>
+</html>

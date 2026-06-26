@@ -1,0 +1,18 @@
+{
+  "name": "ITIL AI Capability Model (6C)",
+  "short_name": "ITIL AI 6C",
+  "description": "Modelo de Competencias IA de ITIL — Modelo 6C",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f172a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
